@@ -1,56 +1,87 @@
+# 🛍️ Ruang Mode — Toko Online Fashion
 
-# 🛍️ Toko Online - FashionStore
+**Ruang Mode** adalah aplikasi web **e-commerce fashion** berbasis **Laravel 13** yang menghadirkan pengalaman belanja online lengkap: katalog produk dengan varian (ukuran/warna), keranjang belanja berbasis session, checkout dengan multi-metode pembayaran (Transfer Bank, E-Wallet, COD) beserta simulasi konfirmasi otomatis, serta panel admin lengkap untuk manajemen kategori, produk, pelanggan, pesanan, dan laporan penjualan yang dapat diekspor ke Excel.
 
-**Toko Online** adalah aplikasi web **e-commerce fashion** berbasis **Laravel 12** yang menghadirkan pengalaman belanja online lengkap dengan varian produk (ukuran/warna), sistem keranjang berbasis session, multi-metode pembayaran (Transfer Bank, E-Wallet, COD), serta panel admin yang powerful untuk manajemen produk, pesanan, pelanggan, dan laporan penjualan.
-
-> **Tujuan Projek:** Tugas akhir mata kuliah Pemrograman Web Lanjut — Sistem e-commerce fashion dengan fitur checkout multi-langkah, auto-konfirmasi pembayaran online, dan laporan penjualan yang dapat diekspor ke Excel.
+> **Tujuan Projek:** Tugas akhir mata kuliah Pemrograman Sistem Informasi — sistem e-commerce fashion dengan checkout multi-langkah, auto-konfirmasi pembayaran online, dan laporan penjualan yang dapat diekspor ke `.xlsx`.
 
 ---
 
 ## 📋 Daftar Isi
 
-- [Fitur Utama](#fitur-utama)
-- [Tech Stack](#tech-stack)
-- [Struktur Database](#struktur-database)
-- [Flow Aplikasi](#flow-aplikasi)
-  - [Flow User (Pembeli)](#flow-user-pembeli)
-  - [Flow Admin](#flow-admin)
-- [Struktur Route](#struktur-route)
-- [Instalasi & Setup](#instalasi--setup)
-- [Akun Demo](#akun-demo)
-- [Screenshot Halaman](#screenshot-halaman)
-- [Lisensi](#lisensi)
+- [Fitur Utama](#-fitur-utama)
+  - [Fitur Pelanggan (Customer)](#-fitur-pelanggan-customer)
+  - [Fitur Admin](#-fitur-admin)
+  - [Simulasi Pembayaran](#-simulasi-pembayaran)
+- [Tech Stack](#-tech-stack)
+- [Struktur Database](#-struktur-database)
+- [Flow Aplikasi](#-flow-aplikasi)
+- [Struktur Route](#-struktur-route)
+- [Instalasi & Setup](#-instalasi--setup)
+- [Akun Demo](#-akun-demo)
+- [Struktur Direktori](#-struktur-direktori)
+- [Catatan Development](#-catatan-development)
+- [Lisensi](#-lisensi)
 
 ---
 
 ## ✨ Fitur Utama
 
-### 👤 Fitur User (Pembeli)
+### 👤 Fitur Pelanggan (Customer)
+
 | Fitur | Deskripsi |
 |-------|-----------|
-| **Registrasi & Login** | Daftar akun baru atau login sebagai pelanggan |
-| **Katalog Produk** | Lihat semua produk, filter berdasarkan kategori & pencarian |
-| **Produk Unggulan** | Menampilkan 4 produk featured di halaman depan |
-| **Detail Produk** | Pilih **ukuran (Size)** & **warna (Color)** sebelum masuk keranjang |
-| **Harga Diskon** | Menampilkan sale price jika produk sedang diskon |
-| **Keranjang Belanja** | Simpan keranjang di **session**, update quantity, hapus item |
-| **Checkout 3 Langkah** | Review pesanan → isi alamat → pilih pembayaran |
-| **Pembayaran** | **Transfer Bank** (auto-VA), **E-Wallet** (auto-TRX ID), **COD** |
-| **Riwayat Pesanan** | Lihat daftar & detail pesanan dengan **timeline status** |
-| **Profil & Password** | Edit profil dan ganti password |
+| **Registrasi** | Daftar akun (nama, email, password + konfirmasi, no. HP, alamat). Otomatis login & diarahkan ke toko |
+| **Login & Remember Me** | Login dengan email & password. Redirect otomatis: admin → dashboard, customer → toko |
+| **Logout** | Keluar dengan aman (session di-invalidate & token di-regenerate) |
+| **Katalog Produk** | Grid semua produk aktif, **pencarian nama**, **filter kategori**, pagination 12 produk/halaman, urut terbaru |
+| **Produk Unggulan** | Menampilkan 4 produk featured (`is_featured`) di beranda toko |
+| **Detail Produk** | Gambar, harga normal & harga diskon (dicoret), stok, SKU, bahan, **pilih ukuran & warna**, atur jumlah, produk terkait (4 dari kategori sama) |
+| **Keranjang Belanja** | Berbasis **session**, tombol +/− quantity, hapus item, subtotal real-time, **badge jumlah item** di navbar |
+| **Varian di Keranjang** | Produk sama dengan ukuran/warna berbeda = item keranjang berbeda (key `product_id\|size\|color`) |
+| **Checkout** | Halaman checkout dengan alamat pengiriman (otomatis terisi dari profil), catatan opsional, dan pilihan metode pembayaran |
+| **3 Metode Pembayaran** | 🔵 Transfer Bank, 🟢 E-Wallet (bayar online, otomatis terkonfirmasi), 🟡 COD (bayar di tempat) |
+| **Ongkos Kirim** | Flat Rp 15.000 per transaksi (dihitung otomatis di ringkasan) |
+| **Riwayat Pesanan** | Daftar semua pesanan pribadi (10/halaman) dengan badge status berwarna |
+| **Detail Pesanan** | Rincian item, alamat, referensi pembayaran, dan **timeline status** pesanan |
+| **Keamanan Pesanan** | User hanya bisa melihat pesanannya sendiri (403 jika mengakses pesanan orang lain) |
+| **Profil Saya** | Edit nama, no. HP, dan alamat |
+| **Ganti Password** | Verifikasi password lama + password baru minimal 6 karakter dengan konfirmasi |
 
 ### 👑 Fitur Admin
+
 | Fitur | Deskripsi |
 |-------|-----------|
-| **Dashboard** | Statistik ringkas: total produk, pesanan, pendapatan, pelanggan |
-| **Manajemen Kategori** | CRUD kategori, upload gambar, aktif/nonaktifkan |
-| **Manajemen Produk** | CRUD produk, upload gambar, atur harga/stok/varian/diskon |
-| **Manajemen Pelanggan** | Lihat & kelola data pelanggan dari panel admin |
-| **Manajemen Pesanan** | Lihat semua pesanan, filter status, **update status & pembayaran** |
-| **Buat Pesanan Manual** | Admin dapat membuat pesanan untuk pelanggan |
-| **Laporan Penjualan** | Grafik & tabel, filter **Hari Ini / Bulan Ini / Tahun Ini** |
-| **Ekspor Excel** | Download laporan penjualan ke format `.xlsx` |
-| **Stok Menipis** | Notifikasi produk dengan stok ≤ 10 |
+| **Dashboard** | Statistik: total produk, total pesanan, **total pendapatan** (dari pesanan `paid`), total pelanggan |
+| **Dashboard — Kategori Terpopuler** | Bar chart relatif 5 kategori dengan jumlah produk terbanyak |
+| **Dashboard — Pesanan Terbaru** | 5 pesanan terakhir beserta status |
+| **Dashboard — Stok Menipis** | Peringatan 4 produk dengan stok ≤ 10 |
+| **Manajemen Kategori** | CRUD kategori (nama, deskripsi, gambar, aktif/nonaktif), pencarian, jumlah produk per kategori, pagination 10 |
+| **Manajemen Produk** | CRUD produk lengkap: nama, kategori, SKU (unik), harga, harga diskon (harus < harga normal), stok, ukuran, warna, bahan, gambar, **aktif** & **unggulan (featured)** |
+| **Filter Produk** | Pencarian nama/SKU, filter kategori, filter status aktif/nonaktif, pagination 12 |
+| **Detail Produk (Admin)** | Menampilkan daftar item pesanan yang memuat produk tersebut |
+| **Manajemen Pelanggan** | CRUD pelanggan (nama, email unik, password, no. HP, alamat), pencarian nama/email/HP, lihat jumlah pesanan per pelanggan, pagination 10 |
+| **Manajemen Pesanan** | Daftar semua pesanan, **pencarian** (nomor pesanan / nama pelanggan), **filter status** & **filter status pembayaran**, pagination 10 |
+| **Detail Pesanan (Admin)** | Info pelanggan, rincian item + varian, alamat kirim, catatan, referensi pembayaran, total |
+| **Buat Pesanan Manual** | Admin dapat membuat pesanan untuk pelanggan: pilih pelanggan, produk (stok > 0), jumlah, ukuran/warna, ongkir, diskon, metode bayar. **Stok otomatis berkurang** |
+| **Update Status Pesanan** | `pending → processing → shipped → completed`, atau `cancelled`. Jika dibatalkan, **stok otomatis dikembalikan** |
+| **Update Status Pembayaran** | `unpaid → paid → refunded` |
+| **Hapus Pesanan** | Menghapus pesanan & **mengembalikan stok** produk terkait |
+| **Laporan Penjualan** | Filter periode **Hari Ini / Bulan Ini / Tahun Ini**: total pendapatan, total pesanan, rata-rata nilai order |
+| **Laporan — Produk Terlaris** | Top 10 produk berdasarkan jumlah terjual & pendapatan (hanya pesanan `paid`) |
+| **Laporan — Kategori Terpopuler** | Kategori dengan penjualan terbanyak |
+| **Laporan — Pesanan Terbaru** | 10 pesanan terakhir periode terpilih |
+| **Laporan — Stok Menipis** | 10 produk dengan stok ≤ 10 |
+| **Ekspor Excel** | Download laporan periode terpilih ke `.xlsx` (ringkasan, produk terlaris, detail pesanan) via PhpSpreadsheet |
+
+### 💳 Simulasi Pembayaran
+
+Aplikasi menyimulasikan konfirmasi pembayaran otomatis untuk metode online:
+
+| Metode | Perilaku | Status Awal | Referensi |
+|--------|----------|-------------|-----------|
+| 🔵 **Transfer Bank** | Langsung terkonfirmasi (simulasi) | `processing` / `paid` | `VA-YYYYMMDD-XXXXXXXX` (Virtual Account) |
+| 🟢 **E-Wallet** | Langsung terkonfirmasi (simulasi) | `processing` / `paid` | `TRX-YYYYMMDD-XXXXXXXX` (Transaction ID) |
+| 🟡 **COD** | Bayar saat barang diterima | `pending` / `unpaid` | — |
 
 ---
 
@@ -58,427 +89,320 @@
 
 | Layer | Teknologi |
 |-------|-----------|
-| **Framework** | Laravel 12 |
-| **PHP** | PHP 8.2+ |
-| **Database** | MySQL / MariaDB |
-| **Frontend** | Blade Templating + Tailwind CSS + JavaScript |
-| **Build Tool** | Vite (Laravel Vite) |
-| **UI Library** | FontAwesome 5 (icons) |
-| **Excel Export** | PhpSpreadsheet |
-| **Image** | Upload ke `storage/app/public/` atau URL eksternal |
+| **Framework** | Laravel 13 (`laravel/framework ^13.8`) |
+| **PHP** | PHP ^8.3 — butuh **ekstensi `zip`** (untuk ekspor Excel) |
+| **Database** | SQLite (default bawaan projek) — mendukung MySQL/MariaDB via `.env` |
+| **Frontend** | Blade Templating + Tailwind CSS 4 |
+| **Build Tool** | Vite 8 (`laravel-vite-plugin`) |
+| **Ikon** | Inline SVG (tanpa library eksternal) |
+| **Excel Export** | PhpSpreadsheet 5.8 |
+| **Testing** | PHPUnit 12.5 |
+| **Penyimpanan Gambar** | Upload ke `storage/app/public/` atau URL eksternal |
 
 ---
 
-## 🗄 Struktur Database
+## 🗄️ Struktur Database
 
 ### Entity Relationship Diagram
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   Users     │1──N│    Orders    │1──N│  OrderItems  │
-├─────────────┤     ├──────────────┤     ├─────────────┤
-│ id          │     │ id           │     │ id          │
-│ name        │     │ order_number │     │ order_id    │
-│ email       │     │ user_id (FK) │────▶│ product_id  │
-│ password    │     │ subtotal     │     │ product_name│
-│ role        │     │ shipping_cost│     │ price       │
-│  (admin/    │     │ discount     │     │ quantity    │
-│   customer) │     │ total        │     │ subtotal    │
-│ phone       │     │ status       │     │ size        │
-│ address     │     │  (pending/   │     │ color       │
-└─────────────┘     │   processing/│     └─────────────┘
-                    │   shipped/   │
-┌─────────────┐     │   completed/ │     ┌─────────────┐
-│  Categories │1──N│   cancelled)  │     │  Customers  │
-├─────────────┤     │ payment_method│     ├─────────────┤
-│ id          │     │  (transfer/  │     │ id          │
-│ name        │     │   cod/       │     │ name        │
-│ slug        │     │   e-wallet)  │     │ email       │
-│ description │     │ payment_     │     │ phone       │
-│ image       │     │  status      │     │ address     │
-│ is_active   │     │  (unpaid/    │     │ city        │
-└─────────────┘     │   paid/      │     │ province    │
-                    │   refunded)  │     │ postal_code │
-┌─────────────┐     │ payment_     │     │ is_active   │
-│   Products  │N──1│  reference   │     └─────────────┘
-├─────────────┤     │ shipping_    │
-│ id          │     │  address     │
-│ category_id │     │ notes        │
-│ name        │     │ created_at   │
-│ slug        │     └──────────────┘
-│ sku         │
-│ price       │
-│ sale_price  │
-│ stock       │
-│ size        │
-│ color       │
-│ material    │
-│ image       │
-│ is_active   │
-│ is_featured │
-└─────────────┘
+┌─────────────┐     ┌──────────────┐     ┌──────────────┐
+│    Users    │1──N│    Orders    │1──N│  OrderItems  │
+├─────────────┤     ├──────────────┤     ├──────────────┤
+│ id          │     │ id           │     │ id           │
+│ name        │     │ order_number │     │ order_id(FK) │
+│ email       │     │ user_id (FK) │     │ product_id   │
+│ role        │     │ subtotal     │     │ product_name │
+│  (admin /   │     │ shipping_cost│     │ price        │
+│   customer) │     │ discount     │     │ quantity     │
+│ phone       │     │ total        │     │ subtotal     │
+│ address     │     │ status       │     │ size         │
+│ password    │     │ payment_method│    │ color        │
+└─────────────┘     │ payment_status│    └──────────────┘
+       │            │ payment_ref  │            │
+       │            │ shipping_addr│            │ N
+       │            │ notes        │            │
+       │            │ created_at   │            │ 1
+       │            └──────────────┘     ┌──────────────┐
+       │                                 │   Products   │
+       │                                 ├──────────────┤
+       │                                 │ id           │
+       │                                 │ category_id  │
+       │                                 │ name, slug   │
+       │                                 │ sku          │
+       │                                 │ description  │
+       │                                 │ price        │
+       │                                 │ sale_price   │
+       │                                 │ stock        │
+       │                                 │ size, color  │
+       │                                 │ material     │
+       │                                 │ image        │
+       │                                 │ is_active    │
+       │                                 │ is_featured  │
+       │                                 └──────┬───────┘
+       │                                        │ N
+       │                                        │ 1
+       │                                 ┌──────────────┐
+       │                                 │  Categories  │
+       │                                 ├──────────────┤
+       │                                 │ id           │
+       │                                 │ name, slug   │
+       │                                 │ description  │
+       │                                 │ image        │
+       │                                 │ is_active    │
+       └─────────────────────────────────└──────────────┘
 ```
 
 ### Tabel & Deskripsi
 
 | Tabel | Fungsi |
 |-------|--------|
-| **users** | Data user (admin & customer) dengan kolom `role`, `phone`, `address` |
-| **customers** | Data pelanggan tambahan (city, province, postal_code) |
-| **categories** | Kategori produk, mendukung upload gambar |
-| **products** | Produk dengan harga normal & diskon, stok, varian (size/color/material) |
-| **orders** | Pesanan dengan subtotal, ongkir, diskon, total, status, metode pembayaran |
-| **order_items** | Item dalam pesanan (snapshot nama produk, harga, varian saat checkout) |
+| **users** | Data user dengan kolom `role` (`admin` / `customer`), `phone`, `address`. Sumber data pelanggan (dikelola lewat menu Pelanggan = filter `role = customer`) |
+| **categories** | Kategori produk: nama, slug otomatis, deskripsi, gambar, status aktif |
+| **products** | Produk: harga normal & harga diskon, stok, varian (`size`, `color`, `material`), gambar, `is_active`, `is_featured` |
+| **orders** | Pesanan: subtotal, ongkir, diskon, total, status pesanan, metode & status pembayaran, referensi pembayaran, alamat kirim, catatan |
+| **order_items** | Item pesanan: **snapshot** nama produk, harga, dan varian saat checkout (riwayat aman walau produk berubah) |
+| **customers** | Skema cadangan (legacy) — saat ini pengelolaan pelanggan menggunakan tabel `users` |
+
+### Nilai Enum Penting
+
+| Kolom | Nilai |
+|-------|-------|
+| `orders.status` | `pending`, `processing`, `shipped`, `completed`, `cancelled` |
+| `orders.payment_method` | `transfer`, `cod`, `e-wallet` |
+| `orders.payment_status` | `unpaid`, `paid`, `refunded` |
+| `users.role` | `admin`, `customer` |
 
 ---
 
 ## 🔄 Flow Aplikasi
 
-### Flow User (Pembeli)
+### Flow Pelanggan
 
 ```
-┌──────────┐
-│  LANDING │── (belum login) → Halaman Login/Register
-│   PAGE   │── (sudah login)
-└────┬─────┘
-     │
-     ▼
-┌──────────────┐      ┌───────────────────┐
-│   DAFTAR /   │ ──▶  │  REGISTRASI AKUN  │
-│    LOGIN     │      │ (nama, email,     │
-└──────┬───────┘      │  password, dll)   │
-       │              └───────────────────┘
-       ▼
-┌──────────────────────────────────────┐
-│         HALAMAN UTAMA TOKO            │
-│  • Produk Unggulan (Featured)        │
-│  • Semua Produk (12/halaman)         │
-│  • Filter Kategori & Pencarian       │
-└──────────────┬───────────────────────┘
-               │
-               ▼
-┌──────────────────────────────────────┐
-│         DETAIL PRODUK                │
-│  • Nama, Harga, Diskon, Stok         │
-│  • PILIH UKURAN (Size)               │
-│  • PILIH WARNA (Color)               │
-│  • Atur Jumlah (Quantity)            │
-│  • Produk Terkait (Related)          │
-│  ┌──────────────┐                    │
-│  │ TAMBAH KE   │                    │
-│  │ KERANJANG   │                    │
-│  └──────┬───────┘                    │
-└─────────┼────────────────────────────┘
-          │
-          ▼
-┌──────────────────────────────────────┐
-│         KERANJANG BELANJA            │
-│  • List item (gambar, nama, varian)  │
-│  • Tombol + / - quantity             │
-│  • Tombol Hapus item                 │
-│  • Subtotal                          │
-│  ┌──────────────┐                    │
-│  │  CHECKOUT    │  atau terus        │
-│  └──────┬───────┘  belanja           │
-└─────────┼────────────────────────────┘
-          │
-          ▼
-┌──────────────────────────────────────────┐
-│          CHECKOUT (3 Langkah)            │
-│                                          │
-│  Langkah 1: Review Pesanan               │
-│  • Daftar barang dengan varian & harga   │
-│                                          │
-│  Langkah 2: Alamat Pengiriman            │
-│  • Isi alamat (pre-filled dari profil)   │
-│  • Catatan (opsional)                    │
-│                                          │
-│  Langkah 3: Metode Pembayaran            │
-│  • 🔵 Transfer Bank → VA otomatis       │
-│  • 🟢 E-Wallet → TRX ID otomatis        │
-│  • 🟡 COD (Bayar di Tempat)              │
-│                                          │
-│  Ringkasan: Subtotal + Ongkir (Rp15k)    │
-│  ┌──────────────┐                        │
-│  │  BUAT PESANAN│                        │
-│  └──────┬───────┘                        │
-└─────────┼────────────────────────────────┘
-          │
-          ├──────────────────────────────────────┐
-          │                                      │
-          ▼                                      ▼
-┌────────────────────┐            ┌──────────────────────────┐
-│ TRANSFER / E-WALLET│            │          COD             │
-│ Auto-bayar ✅      │            │ Bayar saat diterima      │
-│ Status: Processing │            │ Status: Pending           │
-│ Payment: Paid      │            │ Payment: Unpaid           │
-│ Ref: VA-XXX /      │            │                          │
-│ TRX-XXX            │            │                          │
-└─────────┬──────────┘            └──────────┬───────────────┘
-          │                                  │
-          └──────────┬───────────────────────┘
-                     │
-                     ▼
-┌───────────────────────────────────────────┐
-│              KONFIRMASI PESANAN            │
-│  • Nomor Pesanan: ORD-XXXXXX             │
-│  • Referensi Pembayaran (jika online)    │
-│  • Status Pesanan (timeline)             │
-│  • Rincian Barang & Alamat               │
-│  • Tombol: Lihat Semua Pesanan            │
-└───────────────────────────────────────────┘
-                     │
-                     ▼
-┌───────────────────────────────────────────┐
-│           DAFTAR PESANAN SAYA             │
-│  • Semua pesanan (10/halaman)            │
-│  • Card: gambar, nama, status badge      │
-│  • Status Timeline warna-warni           │
-│  • Klik → lihat detail                   │
-└───────────────────────────────────────────┘
-                     │
-                     ▼
-┌───────────────────────────────────────────┐
-│               PROFIL SAYA                  │
-│  • Edit Nama, No. HP, Alamat             │
-│  • Ganti Password                         │
-└───────────────────────────────────────────┘
+Landing (/) ─┬─ belum login ──▶ Login / Register
+             └─ sudah login ──▶ Toko (/store) atau Dashboard (/dashboard untuk admin)
+
+BERBELANJA
+──────────
+Katalog Produk  ──▶  Detail Produk  ──▶  Keranjang  ──▶  Checkout  ──▶  Pesanan Dibuat
+ • cari produk        • pilih ukuran      • +/− qty        • alamat        • nomor ORD-xxxx
+ • filter kategori    • pilih warna       • hapus item     • catatan       • referensi VA/TRX
+ • 12/halaman         • atur jumlah       • subtotal       • metode bayar  • cart dikosongkan
+                      • produk terkait                     • ongkir 15rb
+
+SETELAH CHECKOUT
+────────────────
+Halaman Konfirmasi Pesanan ──▶ Riwayat Pesanan ──▶ Detail + Timeline Status
+                                       │
+                                       ▼
+                              Profil: edit data & ganti password
 ```
 
-**Alur Status Pesanan (User Side):**
+**Alur Status Pesanan (sisi pelanggan):**
 ```
-COD:   Pending ─▶ Processing ─▶ Shipped ─▶ Completed
-       (unpaid)    (unpaid)      (unpaid)    (paid)
+COD     : Pending ──▶ Processing ──▶ Shipped ──▶ Completed
+          (unpaid)    (unpaid)       (unpaid)     (paid)
 
-Online: Processing ─▶ Shipped ─▶ Completed
-        (paid)       (paid)       (paid)
+Online  : Processing ──▶ Shipped ──▶ Completed
+          (paid)         (paid)       (paid)
 
-Semua: ─▶ Cancelled (stok dikembalikan)
+Semua   : ──▶ Cancelled (stok dikembalikan)
 ```
-
----
 
 ### Flow Admin
 
 ```
-┌──────────┐
-│  LOGIN   │── (email: admin@fashionstore.id, password: password)
-└────┬─────┘
-     │
-     ▼
-┌────────────────────────────────────────────┐
-│              DASHBOARD ADMIN                │
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────────┐ │
-│  │Produk│ │Pesanan│ │Revenue│ │Pelanggan │ │
-│  │  24  │ │  35  │ │Rp15jt│ │    150    │ │
-│  └──────┘ └──────┘ └──────┘ └──────────┘ │
-│                                            │
-│  📊 Kategori Terpopuler (bar chart)       │
-│  📦 Pesanan Terbaru (5 terakhir)          │
-│  ⚠️ Stok Menipis (≤10)                    │
-└────────────────────────────────────────────┘
-         │
-         ├──────────────────────────────────────────┐
-         │                  │                       │
-         ▼                  ▼                       ▼
-┌─────────────────┐ ┌──────────────────┐ ┌─────────────────────┐
-│  KATEGORI        │ │   PRODUK         │ │   PELANGGAN         │
-│  CRUD            │ │   CRUD           │ │   CRUD              │
-├─────────────────┤ ├──────────────────┤ ├─────────────────────┤
-│ • List/search   │ │ • List/search/   │ │ • List/search       │
-│ • Nama, deskripsi│ │   filter kategori│ │ • Nama, email, phone │
-│ • Upload gambar  │ │ • Nama, SKU,     │ │ • Buat/edit/hapus   │
-│ • Aktif/nonaktif │ │   harga, stok    │ │ • Lihat jumlah order│
-│ • Lihat jumlah   │ │ • Sale price     │ │                     │
-│   produk        │ │ • Ukuran, warna  │ └─────────────────────┘
-└─────────────────┘ │   bahan          │
-                    │ • Upload gambar   │
-         ┌──────────│ • Aktif/Featured  │──────────┐
-         ▼          └──────────────────┘          ▼
-┌─────────────────────┐              ┌────────────────────────┐
-│    PESANAN          │              │    LAPORAN             │
-│    (CRUD + Status)  │              │    (View & Export)     │
-├─────────────────────┤              ├────────────────────────┤
-│ • List semua pesanan│              │ • Filter Periode:      │
-│   dengan filter:    │              │   • Hari Ini           │
-│   • Search (nomor/  │              │   • Bulan Ini          │
-│     nama pelanggan) │              │   • Tahun Ini          │
-│   • Filter status   │              │                        │
-│   • Filter payment  │              │ 📊 Ringkasan:          │
-├─────────────────────┤              │ • Total Revenue        │
-│ [ID] Lihat detail:  │              │ • Total Orders         │
-│ • Info pelanggan    │              │ • Rata-rata Order      │
-│ • Items pesanan     │              │                        │
-│ • History status    │              │ 🏆 Produk Terlaris     │
-│ • Tombol aksi:      │              │ 📂 Kategori Terpopuler │
-│   • Update Status   │              │ 📦 Pesanan Terbaru     │
-│     - Pending       │              │ ⚠️ Stok Menipis        │
-│     - Processing    │              │                        │
-│     - Shipped       │              │ 📥 Export Excel (.xlsx)│
-│     - Completed     │              └────────────────────────┘
-│     - Cancelled     │
-│   • Update Payment  │
-│     - Unpaid        │
-│     - Paid          │
-│     - Refunded      │
-│ • Buat Pesanan Baru │
-│   (pilih pelanggan  │
-│    & produk manual) │
-└─────────────────────┘
+Login (admin@fashionstore.id) ──▶ Dashboard
+                                    │
+        ┌───────────────┬───────────┼──────────────┬──────────────┐
+        ▼               ▼           ▼              ▼              ▼
+    Kategori         Produk     Pelanggan       Pesanan        Laporan
+      CRUD            CRUD        CRUD        (full control)  (per periode)
+        │               │           │              │              │
+        │               │           │              ├─ Buat pesanan manual
+        │               │           │              │  (stok berkurang)
+        │               │           │              ├─ Update status
+        │               │           │              │  (cancel = stok kembali)
+        │               │           │              ├─ Update pembayaran
+        │               │           │              └─ Hapus (stok kembali)
+        │               │           │                             │
+        ▼               ▼           ▼                             ▼
+   nama, gambar,   +SKU, harga,  nama, email,      Filter: today / monthly / yearly
+   aktif/nonaktif  diskon, stok, password, HP,     ─▶ Produk terlaris, kategori populer,
+                   varian, gambar alamat           pesanan terbaru, stok menipis
+                                                            │
+                                                            ▼
+                                                   📥 Export Excel (.xlsx)
 ```
 
-**Alur Status Pesanan (Admin Side):**
+**Alur Status Pesanan (sisi admin):**
 ```
-PENDING ─▶ PROCESSING ─▶ SHIPPED ─▶ COMPLETED
-   │          │            │
-   ▼          ▼            ▼
- CANCELLED  CANCELLED    CANCELLED
- (stok       (stok        (stok
-  kembali)    kembali)     kembali)
+PENDING ──▶ PROCESSING ──▶ SHIPPED ──▶ COMPLETED
+   │            │              │
+   ▼            ▼              ▼
+CANCELLED   CANCELLED      CANCELLED
+(stok       (stok          (stok
+ kembali)    kembali)       kembali)
 ```
 
 ---
 
 ## 🧭 Struktur Route
 
-### Route Definitions (web.php)
+### 🔓 Guest
 
-```
-🔓 GUEST (Tanpa Login)
-─────────────────────────────────────────────────
-GET  /login                        → Auth\LoginController@showLoginForm
-POST /login                        → Auth\LoginController@login
-GET  /register                     → Auth\RegisterController@showRegistrationForm
-POST /register                     → Auth\RegisterController@register
+| Method | URI | Action |
+|--------|-----|--------|
+| GET | `/login` | `Auth\LoginController@showLoginForm` |
+| POST | `/login` | `Auth\LoginController@login` |
+| GET | `/register` | `Auth\RegisterController@showRegistrationForm` |
+| POST | `/register` | `Auth\RegisterController@register` |
 
-🔐 AUTH (Semua User Login)
-─────────────────────────────────────────────────
-POST /logout                       → Auth\LoginController@logout
+### 🔐 Auth (semua user login)
 
-GET  /                             → Redirect: /dashboard (admin) /store (customer)
+| Method | URI | Action |
+|--------|-----|--------|
+| POST | `/logout` | `Auth\LoginController@logout` |
+| GET | `/` | Redirect otomatis: admin → `/dashboard`, customer → `/store` |
 
-👤 CUSTOMER STORE (Prefix: /store, Middleware: auth)
-─────────────────────────────────────────────────
-GET  /store                        → StoreController@index
-GET  /store/product/{product}     → StoreController@show
-POST /store/cart/add/{product}    → StoreController@addToCart
-GET  /store/cart                   → StoreController@cart
-POST /store/cart/update            → StoreController@updateCart
-DEL  /store/cart/{id}             → StoreController@removeFromCart
-GET  /store/checkout               → StoreController@checkout
-POST /store/order                  → StoreController@placeOrder
-GET  /store/orders                 → StoreController@myOrders
-GET  /store/orders/{order}        → StoreController@showOrder
-GET  /store/profile                → StoreController@profile
-PUT  /store/profile                → StoreController@updateProfile
-PUT  /store/profile/password       → StoreController@changePassword
+### 👤 Toko / Customer (prefix `/store`, middleware `auth`)
 
-👑 ADMIN PANEL (Middleware: auth + admin)
-─────────────────────────────────────────────────
-GET  /dashboard                    → DashboardController@index
+| Method | URI | Action |
+|--------|-----|--------|
+| GET | `/store` | `StoreController@index` — katalog produk |
+| GET | `/store/product/{product}` | `StoreController@show` — detail produk |
+| POST | `/store/cart/add/{product}` | `StoreController@addToCart` |
+| GET | `/store/cart` | `StoreController@cart` |
+| POST | `/store/cart/update` | `StoreController@updateCart` |
+| DELETE | `/store/cart/{id}` | `StoreController@removeFromCart` |
+| GET | `/store/checkout` | `StoreController@checkout` |
+| POST | `/store/order` | `StoreController@placeOrder` |
+| GET | `/store/orders` | `StoreController@myOrders` |
+| GET | `/store/orders/{order}` | `StoreController@showOrder` |
+| GET | `/store/profile` | `StoreController@profile` |
+| PUT | `/store/profile` | `StoreController@updateProfile` |
+| PUT | `/store/profile/password` | `StoreController@changePassword` |
 
-      /categories                  → CategoryController (Resource)
-      /products                    → ProductController (Resource)
-      /customers                   → CustomerController (Resource)
-      /orders                      → OrderController (Resource)
-PATCH /orders/{order}/status       → OrderController@updateStatus
-PATCH /orders/{order}/payment      → OrderController@updatePayment
+### 👑 Admin (middleware `auth` + `admin`)
 
-GET  /reports                      → ReportController@index
-GET  /reports/export-excel         → ReportController@exportExcel
-```
+| Method | URI | Action |
+|--------|-----|--------|
+| GET | `/dashboard` | `DashboardController@index` |
+| — | `/categories` | `CategoryController` (resource: index, create, store, show, edit, update, destroy) |
+| — | `/products` | `ProductController` (resource lengkap) |
+| — | `/customers` | `CustomerController` (resource lengkap) |
+| — | `/orders` | `OrderController` (resource lengkap) |
+| PATCH | `/orders/{order}/status` | `OrderController@updateStatus` |
+| PATCH | `/orders/{order}/payment` | `OrderController@updatePayment` |
+| GET | `/reports` | `ReportController@index` — laporan per periode |
+| GET | `/reports/export-excel` | `ReportController@exportExcel` — download `.xlsx` |
+
+> Akses halaman admin oleh non-admin akan ditolak dengan **403 Forbidden** (via `AdminMiddleware`).
 
 ---
 
-## 📦 Instalasi & Setup
+## 🚀 Instalasi & Setup
 
 ### Prasyarat
-- PHP 8.2+
-- Composer
-- MySQL / MariaDB
-- Node.js & NPM (untuk Vite)
-- Laragon / XAMPP / WAMP (opsional)
+
+- **PHP ≥ 8.3** dengan ekstensi **`zip`** aktif *(wajib — dipakai PhpSpreadsheet untuk ekspor Excel; aktifkan `extension=zip` di `php.ini`)*
+- **Composer**
+- **Node.js & NPM** (untuk build aset Vite)
+- Tanpa perlu server database — projek memakai **SQLite** secara default
 
 ### Langkah Instalasi
 
 ```bash
 # 1. Clone repositori
-git clone https://github.com/username/toko-online.git
-cd toko-online
+git clone https://github.com/ajisaputra007/Ruang-Mode.git
+cd Ruang-Mode
 
 # 2. Install dependensi PHP
 composer install
 
-# 3. Copy & setup environment
-copy .env.example .env
-# Edit .env: atur DB_DATABASE, DB_USERNAME, DB_PASSWORD
+# 3. Copy file environment
+copy .env.example .env      # Windows
+# cp .env.example .env      # Linux / macOS
 
 # 4. Generate application key
 php artisan key:generate
 
-# 5. Buat database & jalankan migrasi
-php artisan migrate
+# 5. Buat file database SQLite
+# Windows (PowerShell):
+New-Item -ItemType File -Path database/database.sqlite -Force
+# Linux / macOS:
+touch database/database.sqlite
 
-# 6. Jalankan seeder (data demo)
-php artisan db:seed
+# 6. Jalankan migrasi + seeder (data demo siap pakai)
+php artisan migrate --seed
 
-# 7. Buat storage symlink (untuk akses gambar)
+# 7. Buat storage symlink (agar gambar upload bisa diakses)
 php artisan storage:link
 
-# 8. Install & build frontend assets
+# 8. Install & build aset frontend
 npm install
 npm run build
 
 # 9. Jalankan development server
 php artisan serve
-
-# 10. (Opsional) Jalankan Vite untuk hot reload
-npm run dev
 ```
 
-### Storage Link
+Buka **http://127.0.0.1:8000** lalu login dengan akun demo di bawah.
+
+### Cara Cepat (satu perintah)
+
 ```bash
-# Penting! Buat symlink agar gambar produk/kategori bisa diakses
-php artisan storage:link
+composer setup
 ```
+*(menjalankan `composer install`, generate key, migrate, `npm install`, dan `npm run build` sekaligus)*
+
+### Mode Development (hot reload)
+
+```bash
+composer dev
+```
+*(menjalankan server + queue listener + log viewer + Vite dev server secara bersamaan)*
+
+### Menggunakan MySQL / MariaDB (opsional)
+
+Ubah `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ruang_mode
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Lalu jalankan kembali `php artisan migrate --seed`.
 
 ---
 
 ## 👥 Akun Demo
 
-| Role | Email | Password |
-|------|-------|----------|
-| **Admin** | `admin@fashionstore.id` | `password` |
-| **Customer** | `rina@email.com` | `password` |
-| **Customer** | `ahmad@email.com` | `password` |
-| **Customer** | `siti@email.com` | `password` |
-| **Customer** | `budi@email.com` | `password` |
-| **Customer** | `dewi@email.com` | `password` |
-| **Customer** | `raka@email.com` | `password` |
+Semua akun menggunakan password: **`password`**
 
----
+| Role | Email |
+|------|-------|
+| **Admin** | `admin@fashionstore.id` |
+| Customer | `rina@email.com` |
+| Customer | `ahmad@email.com` |
+| Customer | `siti@email.com` |
+| Customer | `budi@email.com` |
+| Customer | `dewi@email.com` |
+| Customer | `raka@email.com` |
 
-## 📸 Screenshot Halaman
-
-> *(Tambahkan screenshot di folder `public/screenshots/` dan referensikan di sini)*
-
-| Halaman | Deskripsi |
-|---------|-----------|
-| `public/screenshots/dashboard.png` | Dashboard admin dengan statistik |
-| `public/screenshots/store-index.png` | Halaman utama toko |
-| `public/screenshots/product-detail.png` | Detail produk dengan pilihan varian |
-| `public/screenshots/cart.png` | Keranjang belanja |
-| `public/screenshots/checkout.png` | Halaman checkout |
-| `public/screenshots/orders.png` | Daftar pesanan user |
-| `public/screenshots/admin-orders.png` | Manajemen pesanan admin |
-| `public/screenshots/reports.png` | Laporan penjualan |
+Seeder juga membuat **5 kategori**, **13 produk fashion**, dan **8 pesanan contoh** dengan berbagai status.
 
 ---
 
 ## 📁 Struktur Direktori
 
 ```
-toko-online/
+Ruang-Mode/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
@@ -493,35 +417,26 @@ toko-online/
 │   │   │   ├── ReportController.php
 │   │   │   └── StoreController.php
 │   │   └── Middleware/
-│   ├── Models/
-│   │   ├── Category.php
-│   │   ├── Customer.php
-│   │   ├── Order.php
-│   │   ├── OrderItem.php
-│   │   ├── Product.php
-│   │   └── User.php
+│   │       ├── AdminMiddleware.php
+│   │       └── CustomerMiddleware.php
+│   └── Models/
+│       ├── Category.php   ├── Order.php     ├── Product.php
+│       ├── Customer.php   ├── OrderItem.php └── User.php
 ├── database/
-│   ├── migrations/
-│   │   ├── 0001_01_01_000000_create_users_table.php
-│   │   ├── 2026_06_10_000001_create_categories_table.php
-│   │   ├── 2026_06_10_000002_create_products_table.php
-│   │   ├── 2026_06_10_000003_create_customers_table.php
-│   │   ├── 2026_06_10_000004_create_orders_table.php
-│   │   ├── 2026_06_10_000005_create_order_items_table.php
-│   │   ├── 2026_06_13_042730_add_image_to_categories_table.php
-│   │   ├── 2026_06_13_100000_add_role_to_users_table.php
-│   │   └── 2026_06_18_162102_add_payment_reference_to_orders_table.php
+│   ├── migrations/        (users, cache, jobs, categories, products,
+│   │                       customers, orders, order_items, +role, +image)
+│   ├── factories/         (UserFactory)
 │   └── seeders/
-│       └── DatabaseSeeder.php
+│       └── DatabaseSeeder.php   (admin, 6 customer, 5 kategori, 13 produk, 8 pesanan)
 ├── resources/views/
-│   ├── auth/           (login, register)
-│   ├── categories/     (index, create, edit)
-│   ├── customers/      (index, create, edit)
-│   ├── layouts/        (app.blade.php, store.blade.php)
-│   ├── orders/         (index, show, create)
-│   ├── products/       (index, show, create, edit)
-│   ├── reports/        (index)
-│   ├── store/          (index, show, cart, checkout, orders, order-show, profile)
+│   ├── auth/          (login, register, layout)
+│   ├── categories/    (index, create, edit)
+│   ├── customers/     (index, create, edit)
+│   ├── layouts/       (app = admin, store = toko)
+│   ├── orders/        (index, show, create)
+│   ├── products/      (index, show, create, edit)
+│   ├── reports/       (index)
+│   ├── store/         (index, show, cart, checkout, orders, order-show, profile)
 │   ├── dashboard.blade.php
 │   └── welcome.blade.php
 └── routes/
@@ -532,26 +447,37 @@ toko-online/
 
 ## 🧠 Catatan Development
 
-### Variant Support (Size/Color)
-- Cart menggunakan key format: `{product_id}|{size}|{color}`
-- Produk dengan varian berbeda dianggap item keranjang yang berbeda
-- `StoreController@addToCart` menangani varian ini
+### Varian Produk (Ukuran/Warna)
+- Kolom `size` & `color` menyimpan string (mis. `S/M/L` atau `Merah, Biru`) yang di-*split* di halaman detail produk
+- Keranjang memakai key `{product_id}|{size}|{color}` sehingga varian berbeda dihitung sebagai item terpisah
+- `order_items` menyimpan **snapshot** nama, harga, ukuran, dan warna saat checkout — riwayat pesanan tetap utuh walau data produk berubah kemudian
 
-### Auto-Confirm Pembayaran Online
-- **Transfer Bank:** `VA-YYYYMMDD-XXXXXXXX` (Virtual Account palsu)
-- **E-Wallet:** `TRX-YYYYMMDD-XXXXXXXX` (Transaction ID palsu)
-- Status langsung `processing` + `paid` untuk simulasi
-- Referensi disimpan di kolom `payment_reference`
+### Keranjang Berbasis Session
+- Keranjang disimpan di **session** (bukan database) — cepat dan sederhana
+- Otomatis kosong setelah checkout berhasil atau logout
+- `updateCart` menangani kasus data terkirim sebagai string JSON (cache browser lama)
 
-### Session-Based Cart
-- Keranjang disimpan di **session** (bukan database)
-- Hilang saat logout — cocok untuk guest browsing
-- `updateCart` menangani edge case JSON string dari cache browser lama
+### Auto-Konfirmasi Pembayaran Online
+- **Transfer Bank:** referensi `VA-YYYYMMDD-XXXXXXXX`
+- **E-Wallet:** referensi `TRX-YYYYMMDD-XXXXXXXX`
+- Status pesanan langsung `processing` + `paid` (simulasi pembayaran berhasil)
+- Referensi disimpan di kolom `payment_reference` (ditambahkan via migrasi `add_payment_reference_to_orders_table`)
 
-### View Composers & Components
-- App layout (`layouts/app.blade.php`) untuk admin panel
-- Store layout (`layouts/store.blade.php`) untuk toko dengan Tailwind CSS
-- Status badge menggunakan accessor `status_color` dan `status_label` di model Order
+### Manajemen Stok Otomatis
+- Pesanan manual admin & checkout mengurangi stok
+- **Batal pesanan (`cancelled`)** mengembalikan stok produk
+- **Hapus pesanan** mengembalikan stok produk
+
+### Model & Accessor
+- `Product::effective_price` → otomatis memakai `sale_price` bila ada
+- `Product::is_on_sale` → cek apakah produk sedang diskon
+- `Order::status_label`, `status_color`, `payment_status_label`, `payment_method_label` → label & warna badge siap pakai di Blade
+- `Product::image` & `Category::image` → otomatis mendukung URL eksternal atau path `storage/`
+- Nomor pesanan otomatis dibuat via model event: `ORD-{unik}`
+
+### Layout
+- `layouts/app.blade.php` → layout panel admin
+- `layouts/store.blade.php` → layout toko (Tailwind CSS, sticky navbar, badge keranjang)
 
 ---
 
