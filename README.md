@@ -15,6 +15,7 @@
 - [Tech Stack](#-tech-stack)
 - [Struktur Database](#-struktur-database)
 - [Flow Aplikasi](#-flow-aplikasi)
+- [Activity Diagram (UML)](#-activity-diagram-uml)
 - [Struktur Route](#-struktur-route)
 - [Instalasi & Setup](#-instalasi--setup)
 - [Akun Demo](#-akun-demo)
@@ -63,7 +64,7 @@
 | **Manajemen Pesanan** | Daftar semua pesanan, **pencarian** (nomor pesanan / nama pelanggan), **filter status** & **filter status pembayaran**, pagination 10 |
 | **Detail Pesanan (Admin)** | Info pelanggan, rincian item + varian, alamat kirim, catatan, referensi pembayaran, total |
 | **Buat Pesanan Manual** | Admin dapat membuat pesanan untuk pelanggan: pilih pelanggan, produk (stok > 0), jumlah, ukuran/warna, ongkir, diskon, metode bayar. **Stok otomatis berkurang** |
-| **Update Status Pesanan** | `pending → processing → shipped → completed`, atau `cancelled`. Jika dibatalkan, **stok otomatis dikembalikan** |
+| **Update Status Pesanan** | Admin memilih bebas salah satu dari 5 status (`pending`, `processing`, `shipped`, `completed`, `cancelled`). Jika status diubah menjadi `cancelled` (dari status non-cancelled), **stok otomatis dikembalikan** |
 | **Update Status Pembayaran** | `unpaid → paid → refunded` |
 | **Hapus Pesanan** | Menghapus pesanan & **mengembalikan stok** produk terkait |
 | **Laporan Penjualan** | Filter periode **Hari Ini / Bulan Ini / Tahun Ini**: total pendapatan, total pesanan, rata-rata nilai order |
@@ -237,14 +238,48 @@ Login (admin@fashionstore.id) ──▶ Dashboard
 ```
 
 **Alur Status Pesanan (sisi admin):**
+Admin dapat memilih langsung salah satu dari 5 status (tidak harus berurutan):
+
 ```
-PENDING ──▶ PROCESSING ──▶ SHIPPED ──▶ COMPLETED
-   │            │              │
-   ▼            ▼              ▼
-CANCELLED   CANCELLED      CANCELLED
-(stok       (stok          (stok
- kembali)    kembali)       kembali)
+PENDING · PROCESSING · SHIPPED · COMPLETED · CANCELLED
 ```
+
+Khusus **CANCELLED**: bila status lama bukan `cancelled`, stok seluruh item
+pesanan otomatis dikembalikan.
+
+---
+
+## 📐 Activity Diagram (UML)
+
+Dokumentasi alur bisnis dalam bentuk **UML Activity Diagram** tersedia pada file:
+
+**`activity-diagram-toko-online.drawio`** — 1 halaman cover/legenda + **16 activity diagram** (satu untuk setiap use case utama pelanggan & admin).
+
+### Cara Membuka
+
+1. Buka [draw.io](https://app.diagrams.net) atau aplikasi **draw.io Desktop**
+2. **File → Open From → Device** → pilih `activity-diagram-toko-online.drawio`
+3. Berpindah halaman lewat **tab di bawah kanvas**; ekspor per halaman via **File → Export as → PNG / PDF**
+
+### Daftar Diagram
+
+| Hal. | Diagram | Hal. | Diagram |
+|------|---------|------|---------|
+| 00 | Cover, daftar diagram & legenda notasi | 09 | Dashboard Admin |
+| 01 | Registrasi Akun | 10 | Kelola Kategori |
+| 02 | Login & Logout | 11 | Kelola Produk |
+| 03 | Katalog & Detail Produk | 12 | Kelola Pelanggan |
+| 04 | Keranjang Belanja (Session Cart) | 13 | Buat Pesanan Manual (Admin) |
+| 05 | Checkout & Pembayaran | 14 | Update Status Pesanan |
+| 06 | Riwayat & Detail Pesanan | 15 | Kelola Pembayaran & Hapus Pesanan |
+| 07 | Edit Profil Pelanggan | 16 | Laporan Penjualan & Ekspor Excel |
+| 08 | Ganti Password | | |
+
+### Notasi yang Digunakan
+
+- **Swimlane** per partisipan: **Pelanggan**, **Admin**, dan **Sistem** (proses internal aplikasi)
+- **Start node** (●), **Action**, **Decision** (dengan label **Ya/Tidak**), **Merge**, dan **End node** (◉)
+- Isi diagram disusun berdasarkan **implementasi kode aktual** pada controller, route, dan view
 
 ---
 
@@ -403,6 +438,7 @@ Seeder juga membuat **5 kategori**, **13 produk fashion**, dan **8 pesanan conto
 
 ```
 Ruang-Mode/
+├── activity-diagram-toko-online.drawio   (dokumentasi UML — 17 halaman)
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
@@ -464,8 +500,9 @@ Ruang-Mode/
 - Referensi disimpan di kolom `payment_reference` (ditambahkan via migrasi `add_payment_reference_to_orders_table`)
 
 ### Manajemen Stok Otomatis
-- Pesanan manual admin & checkout mengurangi stok
-- **Batal pesanan (`cancelled`)** mengembalikan stok produk
+- **Pesanan manual admin** (`OrderController@store`) mengurangi stok tiap produk yang dipesan
+- **Checkout pelanggan tidak mengurangi stok** — jumlah hanya divalidasi agar tidak melebihi stok tersedia
+- **Batal pesanan (`cancelled`)** mengembalikan stok produk (hanya bila status lama bukan `cancelled`)
 - **Hapus pesanan** mengembalikan stok produk
 
 ### Model & Accessor
